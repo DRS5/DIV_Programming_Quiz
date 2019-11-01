@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Client {
+/**public class Client {
 
     public static final Logger logger = Logger.getLogger(Client.class.getName());
     public static final String CHARSET = "UTF8";
@@ -48,7 +48,7 @@ public class Client {
 
     }*/
 
-    public void start () {
+    /**public void start () {
 
 
         BufferedReader inputFromServer = null;
@@ -68,4 +68,4 @@ public class Client {
 
     }
 
-}
+}*/

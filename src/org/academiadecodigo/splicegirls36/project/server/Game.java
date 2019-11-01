@@ -1,25 +1,55 @@
 package org.academiadecodigo.splicegirls36.project.server;
 
-import org.academiadecodigo.splicegirls36.project.domain.Question;
 
-import java.io.BufferedWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Game {
 
-    private ServerSocket socket;
+    public static final Logger logger = Logger.getLogger(Game.class.getName());
 
-    public Game (ServerSocket socket) {
+    private ServerSocket serverSocket;
 
-        this.socket = socket;
+    public Game (ServerSocket serverSocket) {
+
+        this.serverSocket = serverSocket;
 
     }
 
     public void setup() {
 
-        BufferedReader
+        Socket clientSocket = null;
+        BufferedReader inputFromClient = null;
+        BufferedWriter outputToClient = null;
+
+        try {
+
+            //while (serverSocket.isBound()) {
+
+                clientSocket = serverSocket.accept();
+                inputFromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                outputToClient = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+
+                inputFromClient.readLine();
+
+                outputToClient.write("Hello");
+                outputToClient.newLine();
+                outputToClient.flush();
+
+            //}
+
+        } catch (IOException exception) {
+
+            logger.log(Level.SEVERE, exception.getMessage());
+
+        }
+
+
+
+
 
     }
 
