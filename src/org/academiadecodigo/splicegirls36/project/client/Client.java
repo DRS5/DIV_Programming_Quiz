@@ -26,7 +26,7 @@ public class Client {
         BufferedWriter out = null;
         Prompt prompt = null;
 
-        try {
+        /**try {
 
             connection = new Socket(address, port);
 
@@ -46,7 +46,7 @@ public class Client {
         outputToServer = out;
         this.prompt = prompt;
 
-    }
+    }*/
 
     public void start () {
 
