@@ -2,9 +2,10 @@ package org.academiadecodigo.splicegirls36.project.store;
 
 import org.academiadecodigo.splicegirls36.project.domain.Answer;
 import org.academiadecodigo.splicegirls36.project.domain.Question;
+import org.academiadecodigo.splicegirls36.project.terminal.Strings;
 
 public interface Validatable {
 
-    public Answer getRightAnswer (Question question);
+    public String getRightAnswer (Question question);
 
 }
