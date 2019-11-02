@@ -2,22 +2,26 @@ package org.academiadecodigo.splicegirls36.project.terminal;
 
 import org.academiadecodigo.bootcamp.Prompt;
 import org.academiadecodigo.bootcamp.scanners.string.StringSetInputScanner;
-
+import org.academiadecodigo.splicegirls36.project.server.RandomQuestionChooser;
 import java.util.HashSet;
 import java.util.Set;
 
+
 public class TerminalPrompt {
 
-    Prompt prompt = new Prompt(System.in, System.out);   //Change output??
+    private final Prompt prompt = new Prompt(System.in, System.out);   //Change output??
+    private final RandomQuestionChooser randomQuestionChooser = new RandomQuestionChooser();
 
-    Set<String> answers = new HashSet<>();
+
+    Set<String> possibleAnswers = new HashSet<>();
+
 
 
     public String askQuestion(){
         setAnswerOptions();
 
-        StringSetInputScanner askQuestion = new StringSetInputScanner(answers);
-        askQuestion.setMessage(Strings.QUESTION_1);
+        StringSetInputScanner askQuestion = new StringSetInputScanner(possibleAnswers);
+        askQuestion.setMessage(randomQuestionChooser.chooseQuestion().getText()); //logic for asking each question
 
         String answer = prompt.getUserInput(askQuestion);
         return answer;
@@ -25,11 +29,10 @@ public class TerminalPrompt {
 
 
     private void setAnswerOptions(){
-        answers.add("A");
-        answers.add("B");
-        answers.add("C");
-        answers.add("D");
-
+        possibleAnswers.add("A");
+        possibleAnswers.add("B");
+        possibleAnswers.add("C");
+        possibleAnswers.add("D");
     }
 
 
