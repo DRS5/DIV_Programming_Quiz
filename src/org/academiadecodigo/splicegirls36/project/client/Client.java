@@ -27,7 +27,7 @@ public class Client {
         try {
 
             connection = new Socket(address, port);
-            logger.log(Level.INFO, LogMessages.CLIENT_CONNECTED + " " + connection);
+            logger.log(Level.INFO, LogMessages.CLIENT_CONNECTED + " " + connection.toString());
 
             in = new BufferedReader(new InputStreamReader(connection.getInputStream(), CHARSET));
             out = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), CHARSET));
@@ -55,6 +55,7 @@ public class Client {
 
             while (serverConnection.isBound()) {
 
+                // Get chosen question from server
                 line = inputFromServer.readLine();
                 while (!line.isEmpty()) {
                     question.append(line);
@@ -62,12 +63,18 @@ public class Client {
                     line = inputFromServer.readLine();
                 }
 
+                // Ask player for chosen answer
                 answer = terminal.askQuestion(question.toString());
                 System.out.println(answer);
 
-                /** outputToServer.write(answer);
+                // Send answer to server
+                outputToServer.write(answer);
                 outputToServer.newLine();
-                outputToServer.flush(); */
+                outputToServer.flush();
+
+                // Get feedback from server
+                line = inputFromServer.readLine();
+                System.out.println(line);
 
             }
 

@@ -6,13 +6,13 @@ import org.academiadecodigo.splicegirls36.project.store.QuestionDatabase;
 import java.util.List;
 
 
-public class RandomQuestionChooser implements QuestionChooser{
+public class SequentialQuestionChooser implements QuestionChooser{
 
     private List<Question> questions;
     private  QuestionDatabase questionDatabase;
     private int questionIndex = 0;
 
-    public RandomQuestionChooser(){
+    public SequentialQuestionChooser(){
         questionDatabase = new QuestionDatabase();
         questionDatabase.buildList();
         questions = questionDatabase.getqAList();

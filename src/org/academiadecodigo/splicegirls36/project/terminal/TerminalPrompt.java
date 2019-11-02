@@ -2,8 +2,7 @@ package org.academiadecodigo.splicegirls36.project.terminal;
 
 import org.academiadecodigo.bootcamp.Prompt;
 import org.academiadecodigo.bootcamp.scanners.string.StringSetInputScanner;
-import org.academiadecodigo.splicegirls36.project.server.QuestionChooser;
-import org.academiadecodigo.splicegirls36.project.server.RandomQuestionChooser;
+
 import java.util.HashSet;
 import java.util.Set;
 
