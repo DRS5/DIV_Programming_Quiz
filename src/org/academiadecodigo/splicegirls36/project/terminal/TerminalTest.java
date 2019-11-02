@@ -1,17 +1,17 @@
 package org.academiadecodigo.splicegirls36.project.terminal;
 
-import org.academiadecodigo.splicegirls36.project.domain.Answer;
-import org.academiadecodigo.splicegirls36.project.domain.Question;
-import org.academiadecodigo.splicegirls36.project.store.QuestionDatabase;
+import org.academiadecodigo.splicegirls36.project.server.QuestionChooser;
+import org.academiadecodigo.splicegirls36.project.server.RandomQuestionChooser;
 
-import java.util.HashMap;
-import java.util.Map;
+
 
 public class TerminalTest {
 
     public static void main(String[] args) {
+        QuestionChooser questionChooser = new RandomQuestionChooser();
 
-        TerminalPrompt prompt = new TerminalPrompt();
+        TerminalPrompt prompt = new TerminalPrompt(questionChooser);
+
 
         prompt.askQuestion();
         prompt.askQuestion();
