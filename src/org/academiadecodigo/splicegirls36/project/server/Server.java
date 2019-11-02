@@ -56,7 +56,6 @@ public class Server {
 
             ServerWorker newWorker = new ServerWorker(clientSocket);
             workerList.add(newWorker);
-            workers.submit(newWorker);
             playerCounter++;
 
             // After game start Stage
@@ -69,8 +68,10 @@ public class Server {
             for (ServerWorker worker : workerList) {
 
                 worker.setQuestion(question);
+                workers.submit(newWorker);
 
             }
+
 
             // Validate answer and return to server worker
 
@@ -124,11 +125,6 @@ public class Server {
 
                 while (true) {
 
-                    while (question == null) {
-
-
-                    }
-
                     // Send chosen question
                     out.write(question.getText());
                     out.newLine();
@@ -138,7 +134,7 @@ public class Server {
                     answer = in.readLine();
                     System.out.println(answer);
 
-                    question = null;
+
                 }
 
             } catch (IOException exception) {
