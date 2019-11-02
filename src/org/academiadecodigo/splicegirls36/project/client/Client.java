@@ -1,4 +1,4 @@
-package org.academiadecodigo.splicegirls36.project.client;
+/** package org.academiadecodigo.splicegirls36.project.client;
 
 import org.academiadecodigo.splicegirls36.project.utils.LogMessages;
 
