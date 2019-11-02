@@ -17,9 +17,10 @@ public class Server {
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                 System.out.println("New Client: " + clientSocket);
-                out.write("test");
+                /*out.write("test");
                 out.newLine();
-                out.flush();
+                out.flush();*/
+                System.out.println(in.readLine());
 
                 clientSocket.close();
             }

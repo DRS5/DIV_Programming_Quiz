@@ -1,4 +1,4 @@
-/** package org.academiadecodigo.splicegirls36.project.client;
+package org.academiadecodigo.splicegirls36.project.client;
 
 import org.academiadecodigo.splicegirls36.project.utils.LogMessages;
 
@@ -58,8 +58,8 @@ public class Client {
                 outputToServer.newLine();
                 outputToServer.flush();
 
-                line = inputFromServer.readLine();
-                System.out.println(line);
+                //line = inputFromServer.readLine();
+                //System.out.println(line);
 
             }
 
@@ -86,8 +86,5 @@ public class Client {
             logger.log(Level.WARNING, exception.getMessage());
 
         }
-
-
     }
-
 }

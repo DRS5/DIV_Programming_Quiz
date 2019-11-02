@@ -5,6 +5,7 @@ import org.academiadecodigo.splicegirls36.project.utils.LogMessages;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.logging.Level;
 
 public class ClientMain {
@@ -19,7 +20,12 @@ public class ClientMain {
 
         try {
 
-            client = new Client(InetAddress.getLocalHost(), 8080);
+            if (args.length != 2){
+                throw new IllegalArgumentException("Usage: java clientmain <host> <port>");
+            }
+            String server = args[0];
+            port = Integer.parseInt(args[1]);
+            client = new Client(InetAddress.getByName(server), port);
             client.start();
 
         } catch (IOException exception) {
