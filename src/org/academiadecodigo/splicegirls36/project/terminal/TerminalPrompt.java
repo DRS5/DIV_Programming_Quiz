@@ -10,22 +10,15 @@ import java.util.Set;
 
 public class TerminalPrompt {
 
-    private final Prompt prompt = new Prompt(System.in, System.out);   //Change output??
-    private final QuestionChooser questionChooser;
+    private final Prompt prompt = new Prompt(System.in, System.out);
+    private Set<String> possibleAnswers = new HashSet<>();
 
 
-    Set<String> possibleAnswers = new HashSet<>();
-
-    public TerminalPrompt(QuestionChooser questionChooser){
-        this.questionChooser = questionChooser;
-    }
-
-
-    public String askQuestion(){
+    public String askQuestion(String question){
         setAnswerOptions();
 
         StringSetInputScanner askQuestion = new StringSetInputScanner(possibleAnswers);
-        askQuestion.setMessage(questionChooser.chooseQuestion().getText()); //logic for asking each question
+        askQuestion.setMessage(question); //logic for asking each question
 
         String answer = prompt.getUserInput(askQuestion);
         return answer;

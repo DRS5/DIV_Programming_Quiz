@@ -1,4 +1,4 @@
-package org.academiadecodigo.splicegirls36.project.server;
+/** package org.academiadecodigo.splicegirls36.project.server;
 
 import org.academiadecodigo.splicegirls36.project.utils.LogMessages;
 
@@ -38,4 +38,4 @@ public class Server_backup {
         game.setup();
     }
 
-}
+} */

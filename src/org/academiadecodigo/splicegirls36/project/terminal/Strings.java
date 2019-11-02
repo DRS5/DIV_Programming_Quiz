@@ -6,10 +6,11 @@ public class Strings {
             "A - Option A; \n " +
             "B - Option B; \n " +
             "C - Option C; \n " +
-            "D - Option D; \n";
+            "D - Option D; \n" +
+            "";
 
 
-    public static final String QUESTION_2 = "Question 2? \n " +
+    /** public static final String QUESTION_2 = "Question 2? \n " +
             "A - Option A; \n " +
             "B - Option B; \n " +
             "C - Option C; \n " +
@@ -27,5 +28,5 @@ public class Strings {
             "A - Option A; \n " +
             "B - Option B; \n " +
             "C - Option C; \n " +
-            "D - Option D; \n ";
+            "D - Option D; \n "; */
 }

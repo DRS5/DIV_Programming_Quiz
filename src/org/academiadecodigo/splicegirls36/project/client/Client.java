@@ -1,5 +1,6 @@
 package org.academiadecodigo.splicegirls36.project.client;
 
+import org.academiadecodigo.splicegirls36.project.terminal.TerminalPrompt;
 import org.academiadecodigo.splicegirls36.project.utils.LogMessages;
 
 import java.io.*;
@@ -45,21 +46,28 @@ public class Client {
 
     public void start () {
 
-        String test = "Testing 1, 2, 3";
         String line;
+        String answer;
+        StringBuilder question = new StringBuilder();
+        TerminalPrompt terminal = new TerminalPrompt();
 
         try {
 
-            //line = inputFromServer.readLine();
-
             while (serverConnection.isBound()) {
 
-                outputToServer.write(test);
-                outputToServer.newLine();
-                outputToServer.flush();
+                line = inputFromServer.readLine();
+                while (!line.isEmpty()) {
+                    question.append(line);
+                    question.append("\n");
+                    line = inputFromServer.readLine();
+                }
 
-                //line = inputFromServer.readLine();
-                //System.out.println(line);
+                answer = terminal.askQuestion(question.toString());
+                System.out.println(answer);
+
+                /** outputToServer.write(answer);
+                outputToServer.newLine();
+                outputToServer.flush(); */
 
             }
 
@@ -68,6 +76,8 @@ public class Client {
             logger.log(Level.SEVERE, exception.getMessage());
 
         }
+
+        close();
 
     }
 

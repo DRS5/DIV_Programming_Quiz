@@ -13,9 +13,9 @@ public class QuestionDatabase implements Validatable {
     public void buildList(){
         this.qAList = new LinkedList<>();
         qAList.add(new Question(Strings.QUESTION_1, "A"));
-        qAList.add(new Question(Strings.QUESTION_2, "B"));
+        /** qAList.add(new Question(Strings.QUESTION_2, "B"));
         qAList.add(new Question(Strings.QUESTION_3, "C"));
-        qAList.add(new Question(Strings.QUESTION_4, "D"));
+        qAList.add(new Question(Strings.QUESTION_4, "D")); */
 
     }
 
