@@ -3,11 +3,12 @@ package org.academiadecodigo.splicegirls36.project.server;
 import org.academiadecodigo.splicegirls36.project.domain.Question;
 import org.academiadecodigo.splicegirls36.project.store.QuestionDatabase;
 import org.academiadecodigo.splicegirls36.project.terminal.Strings;
+import org.academiadecodigo.splicegirls36.project.utils.Constants;
 import org.academiadecodigo.splicegirls36.project.utils.LogMessages;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -19,11 +20,10 @@ import java.util.logging.Logger;
 public class Server {
 
     public static final Logger logger = Logger.getLogger(Server.class.getName());
-    public static final int MAX_PLAYERS = 15;
 
     public static void main(String[] args) {
 
-        int port = 8080; // default value of local port
+        int port = Constants.DEFAULT_PORT; // default value of local port
 
         // Validate first argument being the local port the server should bind to
         if (args.length > 0) {
@@ -33,32 +33,61 @@ public class Server {
         }
 
         Server server = new Server();
-        server.start();
+        server.start(port);
 
     }
 
-    private void start() {
+    private void start(int port) {
 
         List<ServerWorker> workerList = new ArrayList<>();
-        ExecutorService workers = Executors.newFixedThreadPool(MAX_PLAYERS);
+        ExecutorService workers = Executors.newFixedThreadPool(Constants.MAX_PLAYERS);
+        List<String> questions = new ArrayList<>();
+        int playerCounter = 0;
 
         try {
 
-            ServerSocket serverSocket = new ServerSocket(8080);
+            ServerSocket serverSocket = new ServerSocket(port);
+            Socket clientSocket = null;
 
-            // Game Lobby Stage
+            /** Game Lobby Stage */
+            logger.log(Level.INFO, LogMessages.LISTENING_CONNECTIONS);
 
-            // Receive client connection and take socket streams
-            Socket clientSocket = serverSocket.accept();
-            logger.log(Level.INFO, LogMessages.ACCEPTED_CONNECTION + " " + clientSocket);
+            // Receive client connection and pass the corresponding socket to the server worker
 
-            ServerWorker newWorker = new ServerWorker(clientSocket);
-            workerList.add(newWorker);
-            Thread thread = new Thread(newWorker);
-            thread.start();
+            while (playerCounter < Constants.MIN_PLAYERS) {
+
+                clientSocket = serverSocket.accept();
+                logger.log(Level.INFO, LogMessages.ACCEPTED_CONNECTION + " " + clientSocket);
+
+                ServerWorker newWorker = new ServerWorker(clientSocket);
+                workerList.add(newWorker);
+
+                playerCounter++;
+            }
+
+            logger.log(Level.INFO, LogMessages.LC_EXTRA_TIME);
+            while (playerCounter < Constants.MAX_PLAYERS) {
+                try {
+
+                    clientSocket = serverSocket.accept();
+                    logger.log(Level.INFO, LogMessages.ACCEPTED_CONNECTION + " " + clientSocket);
+
+                    ServerWorker newWorker = new ServerWorker(clientSocket);
+                    workerList.add(newWorker);
+                    playerCounter++;
+
+                } catch (SocketTimeoutException timeoutException) {
+
+                    logger.log(Level.WARNING, LogMessages.CLIENT_CONNECTION_TIMED_OUT);
+                    break;
+
+                }
+            }
 
             // After game start Stage
 
+            // Send all questions to all players
+            questions.add(Strings.QUESTION_1);
 
             // Validate answer and return to server worker
 
