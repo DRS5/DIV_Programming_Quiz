@@ -97,25 +97,7 @@ public class Server {
 
             }
 
-            // Validate answer and return to server worker
-
-            for (ServerWorker worker : workerList) {
-
-                String workerAnswer = worker.getAnswer();
-
-            }
-
-            for (ServerWorker worker : workerList) {
-
-                synchronized (worker) {
-                    worker.wait();
-                }
-
-            }
-
-            logger.log(Level.INFO, String.valueOf(rightAnswersCounter));
-
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
 
             logger.log(Level.WARNING, e.getMessage());
 
@@ -132,7 +114,6 @@ public class Server {
 
         private List<String> questions;
         private QuestionDatabase questionDatabase;
-        private int questionIndex = 0;
 
 
         ServerWorker(Socket clientSocket) {
@@ -160,6 +141,8 @@ public class Server {
         public void run() {
 
             int counter = 0;
+            String[] question_split;
+            int totalPoints;
 
             try {
                 questionDatabase.buildList();
@@ -172,30 +155,25 @@ public class Server {
 
                     while (counter < Constants.MAX_ROUNDS) {
 
+                        for (String question : questions) {
+                            question_split = question.split("\n");
+                            for (int i = 0; i < question_split.length; i++) {
 
+                                out.write(question_split[i]);
+                                out.newLine();
+
+                            }
+
+                            out.flush();
+                        }
                         counter++;
 
                     }
-                    out.write(question.getText());
-                    out.newLine();
-                    out.flush();
+
 
                     // Print answer
-                    answer = in.readLine();
-                    System.out.println(answer);
-
-                    if (question.getCorrectAnswer().equals(answer)) {
-
-                        logger.log(Level.INFO, "Right answer");
-                        sendFeedback(Strings.RIGHT_ANSWER);
-
-                    } else {
-
-                        logger.log(Level.INFO, "Wrong answer");
-                        sendFeedback(Strings.WRONG_ANSWER);
-
-                    }
-                    questionIndex++;
+                    totalPoints = Integer.parseInt(in.readLine());
+                    logger.log(Level.INFO, "Total points " + totalPoints);
 
                 }
 
