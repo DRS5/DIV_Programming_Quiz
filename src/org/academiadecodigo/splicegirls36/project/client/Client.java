@@ -7,6 +7,9 @@ import org.academiadecodigo.splicegirls36.project.utils.LogMessages;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,41 +61,66 @@ public class Client {
         String explanation;
         String correctAnswer;
         int counter = 0;
+        List<String> questionStrings = new LinkedList<>();
+        List<String> explanations = new ArrayList<>();
+        List<String> correctAnswers = new ArrayList<>();
+        int points = 0;
 
         try {
 
             while (serverConnection.isBound()) {
 
                 // Get chosen questions from server
-                while (counter < Constants.MAX_ROUNDS) {
+                while (counter < 1) {
                     quizQuestion = inputFromServer.readLine();
                     answerA = inputFromServer.readLine();
                     answerB = inputFromServer.readLine();
                     answerC = inputFromServer.readLine();
                     answerD = inputFromServer.readLine();
-                    question.append(line);
+                    explanation = inputFromServer.readLine();
+                    correctAnswer = inputFromServer.readLine();
+                    question.append(quizQuestion);
+                    question.append(answerA);
+                    question.append(answerB);
+                    question.append(answerC);
+                    question.append(answerD);
                     question.append("\n");
-                    line = inputFromServer.readLine();
+                    questionStrings.add(question.toString());
+                    explanations.add(explanation);
+                    correctAnswers.add(correctAnswer);
+                    question.delete(0, question.length());
                     counter++;
                 }
 
-                // Ask player for chosen answer
-                answer = terminal.askQuestion(question.toString());
-                System.out.println(answer);
+                for (int i = 0; i < Constants.MAX_ROUNDS; i++) {
 
-                // Send answer to server
-                outputToServer.write(answer);
+                    // Ask player for chosen answer
+
+                    answer = terminal.askQuestion(questionStrings.get(i));
+                    System.out.println(answer);
+                    if (answer.equals(correctAnswers.get(i))){
+                        System.out.println("Right Answer");
+                        points++;
+                    } else {
+                        System.out.println("Wrong Answer");
+                    }
+                    System.out.println(explanations.get(i));
+                }
+                outputToServer.write(points);
                 outputToServer.newLine();
                 outputToServer.flush();
 
+                System.out.println("You finished with " + points + "!");
+
+
+
                 // Get feedback from server
-                line = inputFromServer.readLine();
-                System.out.println(line);
+                /*line = inputFromServer.readLine();
+                System.out.println(line);*/
 
             }
 
         } catch (IOException exception) {
-
             logger.log(Level.SEVERE, exception.getMessage());
 
         }
@@ -106,13 +134,10 @@ public class Client {
         try {
 
             if (serverConnection != null) {
-
                 serverConnection.close();
-
             }
 
         } catch (IOException exception) {
-
             logger.log(Level.WARNING, exception.getMessage());
 
         }

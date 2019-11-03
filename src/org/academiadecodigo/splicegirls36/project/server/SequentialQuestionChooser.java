@@ -15,7 +15,6 @@ public class SequentialQuestionChooser implements QuestionChooser{
     public SequentialQuestionChooser(){
         questionDatabase = new QuestionDatabase();
         questionDatabase.buildList();
-        questions = questionDatabase.getqAList();
     }
 
 

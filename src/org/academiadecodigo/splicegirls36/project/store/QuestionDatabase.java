@@ -7,38 +7,37 @@ import java.util.List;
 
 public class QuestionDatabase implements Validatable {
 
-    private List<Question> qAList;
+    private List<String> qAList;
 
 
     public void buildList(){
+
         this.qAList = new LinkedList<>();
-        qAList.add(new Question(Strings.QUESTION_1, "B"));
-        qAList.add(new Question(Strings.QUESTION_2, "A"));
-        qAList.add(new Question(Strings.QUESTION_3, "D"));
-        qAList.add(new Question(Strings.QUESTION_4, "B"));
-        qAList.add(new Question(Strings.QUESTION_5, "A"));
-        qAList.add(new Question(Strings.QUESTION_6, "C"));
-        qAList.add(new Question(Strings.QUESTION_7, "D"));
-        qAList.add(new Question(Strings.QUESTION_8, "A"));
-        qAList.add(new Question(Strings.QUESTION_9, "C"));
-        qAList.add(new Question(Strings.QUESTION_10, "B"));
-        qAList.add(new Question(Strings.QUESTION_11, "C"));
-        qAList.add(new Question(Strings.QUESTION_12, "A"));
-        qAList.add(new Question(Strings.QUESTION_13, "A"));
-        qAList.add(new Question(Strings.QUESTION_14, "C"));
-        qAList.add(new Question(Strings.QUESTION_15, "D"));
-        qAList.add(new Question(Strings.QUESTION_16, "C"));
+        qAList.add(Strings.QUESTION_1);
+        //qAList.add(Strings.QUESTION_2);
+        qAList.add(Strings.QUESTION_3);
+        qAList.add(Strings.QUESTION_4);
+        //qAList.add(Strings.QUESTION_5);
+        qAList.add(Strings.QUESTION_6);
+        qAList.add(Strings.QUESTION_7);
+        qAList.add(Strings.QUESTION_8);
+        //qAList.add(Strings.QUESTION_9);
+        qAList.add(Strings.QUESTION_10);
+        qAList.add(Strings.QUESTION_11);
+        qAList.add(Strings.QUESTION_12);
+        //qAList.add(Strings.QUESTION_13);
+        qAList.add(Strings.QUESTION_14);
+        qAList.add(Strings.QUESTION_15);
+        qAList.add(Strings.QUESTION_16);
 
     }
-
-
 
     @Override
     public String getRightAnswer(Question question) {
         return question.getCorrectAnswer();
     }
 
-    public List<Question> getqAList() {
+    public List<String> getqAList() {
         return qAList;
     }
 

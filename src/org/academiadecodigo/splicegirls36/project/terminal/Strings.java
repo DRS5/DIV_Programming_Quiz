@@ -14,14 +14,14 @@ public class Strings {
             "B" +
             "";
 
-    public static final String QUESTION_2 = "Which of these methods of DatagramPacket is used to find the port number? \n " +
+    /* public static final String QUESTION_2 = "Which of these methods of DatagramPacket is used to find the port number? \n " +
             "A - .getPort(); \n " +
             "B - .port(); \n " +
             "C - .findPort(); \n " +
             "D - .receivePort(); \n" +
             ".getPort() is the method that returns the remote port number to which the socket is connected. \n" +
             "A" +
-            "";
+            "";*/
 
     public static final String QUESTION_3 = "How many reserved keywords does the Java language have? \n " +
             "A - 64;\n " +
@@ -42,14 +42,14 @@ public class Strings {
             "";
 
 
-    public static final String QUESTION_5 = "Which of these access specifiers can be used for an interface?\n " +
+     /*public static final String QUESTION_5 = "Which of these access specifiers can be used for an interface?\n " +
             "A - Public; \n " +
             "B - Protected; \n " +
             "C - private; \n " +
             "D - All of the above; \n" +
             "Interfaces can only have the public or default specifier. \n" +
             "A" +
-            "";
+            "";*/
 
 
     public static final String QUESTION_6 = "What was the first name idea before Sun settled with Java? \n " +
@@ -82,14 +82,14 @@ public class Strings {
             "";
 
 
-    public static final String QUESTION_9 = "Which of these methods is used to set the priority of a thread? \n " +
+     /*public static final String QUESTION_9 = "Which of these methods is used to set the priority of a thread? \n " +
             "A - .set() \n " +
             "B - .level() \n " +
             "C - .setPriority() \n " +
             "D - .setLevel() \n" +
             "Threads have a default priority value of 5, but using the method setPriority() we can explicitly change this to a value between 1 and 10.\n" +
             "C" +
-            "";
+            "";*/
 
 
     public static final String QUESTION_10 = "Which of these allow duplicate elements? \n " +
@@ -122,14 +122,14 @@ public class Strings {
             "";
 
 
-    public static final String QUESTION_13 = "Which of these is a static member of thread?\n " +
+    /* public static final String QUESTION_13 = "Which of these is a static member of thread?\n " +
             "A - .currentThread(); \n " +
             "B - .join(); \n " +
             "C - .getName(); \n " +
             "D - .interrupt(); \n" +
             "currentThread() is a method of the Thread class, used to return a reference to the currently executing thread object. \n" +
             "A" +
-            "";
+            "";*/
 
 
     public static final String QUESTION_14 = "What do you use the javac command for? \n " +
