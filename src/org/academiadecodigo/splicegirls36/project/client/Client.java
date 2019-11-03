@@ -63,6 +63,8 @@ public class Client {
                     line = inputFromServer.readLine();
                 }
 
+
+
                 // Ask player for chosen answer
                 answer = terminal.askQuestion(question.toString());
                 System.out.println(answer);

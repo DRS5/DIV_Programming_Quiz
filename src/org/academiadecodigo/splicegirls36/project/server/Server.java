@@ -1,6 +1,7 @@
 package org.academiadecodigo.splicegirls36.project.server;
 
 import org.academiadecodigo.splicegirls36.project.domain.Question;
+import org.academiadecodigo.splicegirls36.project.store.QuestionDatabase;
 import org.academiadecodigo.splicegirls36.project.terminal.Strings;
 import org.academiadecodigo.splicegirls36.project.utils.LogMessages;
 
@@ -47,53 +48,34 @@ public class Server {
 
             ServerSocket serverSocket = new ServerSocket(8080);
 
-            QuestionChooser questionChooser = new SequentialQuestionChooser();
-
             // Game Lobby Stage
 
             // Receive client connection and take socket streams
             Socket clientSocket = serverSocket.accept();
             logger.log(Level.INFO, LogMessages.ACCEPTED_CONNECTION + " " + clientSocket);
 
+            playerCounter++;
             ServerWorker newWorker = new ServerWorker(clientSocket);
             workerList.add(newWorker);
-            playerCounter++;
+            Thread thread = new Thread(newWorker);
+            thread.start();
 
             // After game start Stage
 
-            // Choose a question
-            question = questionChooser.chooseQuestion();
-
-            // Send question to all workers
-
-            for (ServerWorker worker : workerList) {
-
-                workers.submit(worker);
-
-            }
 
             // Validate answer and return to server worker
 
             for (ServerWorker worker : workerList) {
 
                 String workerAnswer = worker.getAnswer();
-                if (question.getCorrectAnswer().equals(workerAnswer)) {
 
-                    rightAnswersCounter++;
-                    logger.log(Level.INFO, "Right answer");
-                    worker.sendFeedback(Strings.RIGHT_ANSWER);
-
-                } else {
-
-                    logger.log(Level.INFO, "Wrong answer");
-                    worker.sendFeedback(Strings.WRONG_ANSWER);
-
-                }
             }
 
             for (ServerWorker worker : workerList) {
 
-                worker.wait();
+                synchronized (worker) {
+                    worker.wait();
+                }
 
             }
 
@@ -115,13 +97,20 @@ public class Server {
 
         private Socket clientSocket;
 
+        private String answer;
+
         private BufferedWriter out;
 
-        private String answer;
+        private List<Question> questions;
+        private QuestionDatabase questionDatabase;
+        private int questionIndex = 0;
+
+        QuestionChooser questionChooser = new SequentialQuestionChooser();
 
         ServerWorker(Socket clientSocket) {
 
             this.clientSocket = clientSocket;
+            this.questionDatabase = new QuestionDatabase();
 
         }
 
@@ -129,11 +118,16 @@ public class Server {
         public void run() {
 
             try {
+                questionDatabase.buildList();
+                questions = questionDatabase.getqAList();
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
 
                 while (true) {
+                    // Choose a question
+                    question = chooseQuestion();
+
 
                     // Send chosen question
                     out.write(question.getText());
@@ -144,6 +138,19 @@ public class Server {
                     answer = in.readLine();
                     System.out.println(answer);
 
+                    if (question.getCorrectAnswer().equals(answer)) {
+
+                        logger.log(Level.INFO, "Right answer");
+                        sendFeedback(Strings.RIGHT_ANSWER);
+
+                    } else {
+
+                        logger.log(Level.INFO, "Wrong answer");
+                        sendFeedback(Strings.WRONG_ANSWER);
+
+                    }
+                    questionIndex++;
+
                 }
 
             } catch (IOException exception) {
@@ -152,7 +159,7 @@ public class Server {
 
         }
 
-        private void sendFeedback (String feedback) {
+        private void sendFeedback(String feedback) {
 
             try {
 
@@ -166,10 +173,15 @@ public class Server {
             }
         }
 
-        String getAnswer () {
+        String getAnswer() {
 
             return answer;
 
+        }
+
+        public Question chooseQuestion() {
+            Question question = questions.get(questionIndex);
+            return question;
         }
     }
 }
