@@ -117,7 +117,7 @@ public class Client {
                 outputToServer.newLine();
                 outputToServer.flush();
 
-                System.out.println("You finished with " + points + " POOOOOOOOOINTS!!");
+                System.out.println("You finished with " + points + " POOOOOOOOOINTS!!!");
                 close();
 
 
