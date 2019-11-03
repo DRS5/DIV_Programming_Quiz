@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface QuestionChooser {
 
-    public Question chooseQuestion();
+    public String chooseQuestion();
 
 }
