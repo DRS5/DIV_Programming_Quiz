@@ -99,7 +99,7 @@ public class Server {
 
             }
 
-            /** while ()
+            // while ()
             wait();
             int totalPoints = getTotalPoints(); */
 
@@ -190,7 +190,7 @@ public class Server {
 
                     // Print answer
                     totalPoints = Integer.parseInt(in.readLine());
-                    //Server.this.addPoints(totalPoints);
+                    Server.this.addPoints(totalPoints);
                     logger.log(Level.INFO, "Total points " + totalPoints);
 
                 }
