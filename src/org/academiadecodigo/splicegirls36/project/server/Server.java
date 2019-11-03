@@ -20,9 +20,9 @@ public class Server {
     public static final Logger logger = Logger.getLogger(Server.class.getName());
     public static final int MAX_PLAYERS = 15;
 
-    private ExecutorService workers;
-
-    private List<ServerWorker> workerList;
+    private final ExecutorService workers;
+    private final List<ServerWorker> workerList;
+    private Question question;
 
     public static void main(String[] args) {
 
@@ -44,6 +44,7 @@ public class Server {
         int playerCounter = 0;
 
         try {
+
             ServerSocket serverSocket = new ServerSocket(8080);
 
             QuestionChooser questionChooser = new SequentialQuestionChooser();
@@ -61,17 +62,15 @@ public class Server {
             // After game start Stage
 
             // Choose a question
-            Question question = questionChooser.chooseQuestion();
+            question = questionChooser.chooseQuestion();
 
             // Send question to all workers
 
             for (ServerWorker worker : workerList) {
 
-                worker.setQuestion(question);
-                workers.submit(newWorker);
+                workers.submit(worker);
 
             }
-
 
             // Validate answer and return to server worker
 
@@ -90,21 +89,32 @@ public class Server {
                     worker.sendFeedback(Strings.WRONG_ANSWER);
 
                 }
-
-                logger.log(Level.INFO, String.valueOf(rightAnswersCounter));
             }
 
-        } catch (IOException e) {
+            for (ServerWorker worker : workerList) {
+
+                worker.wait();
+
+            }
+
+            logger.log(Level.INFO, String.valueOf(rightAnswersCounter));
+
+        } catch (IOException | InterruptedException e) {
+
             logger.log(Level.WARNING, e.getMessage());
+
         }
+
+    }
+
+    public Question getQuestion() {
+        return question;
     }
 
     private final class ServerWorker implements Runnable {
 
         private Socket clientSocket;
-        private Question question;
 
-        private BufferedReader in;
         private BufferedWriter out;
 
         private String answer;
@@ -112,15 +122,15 @@ public class Server {
         ServerWorker(Socket clientSocket) {
 
             this.clientSocket = clientSocket;
-        }
 
+        }
 
         @Override
         public void run() {
 
             try {
 
-                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
 
                 while (true) {
@@ -133,7 +143,6 @@ public class Server {
                     // Print answer
                     answer = in.readLine();
                     System.out.println(answer);
-
 
                 }
 
@@ -158,11 +167,9 @@ public class Server {
         }
 
         String getAnswer () {
-            return answer;
-        }
 
-        void setQuestion (Question question) {
-            this.question = question;
+            return answer;
+
         }
     }
 }
