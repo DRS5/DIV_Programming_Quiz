@@ -76,6 +76,8 @@ public class Client {
                     counter++;
                 }
 
+
+
                 // Ask player for chosen answer
                 answer = terminal.askQuestion(question.toString());
                 System.out.println(answer);

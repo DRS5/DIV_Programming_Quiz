@@ -1,12 +1,12 @@
 package org.academiadecodigo.splicegirls36.project.server;
 
-import org.academiadecodigo.splicegirls36.project.domain.Question;
-import org.academiadecodigo.splicegirls36.project.terminal.Strings;
+import org.academiadecodigo.splicegirls36.project.store.QuestionDatabase;
+import org.academiadecodigo.splicegirls36.project.utils.Constants;
 import org.academiadecodigo.splicegirls36.project.utils.LogMessages;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -18,88 +18,92 @@ import java.util.logging.Logger;
 public class Server {
 
     public static final Logger logger = Logger.getLogger(Server.class.getName());
-    public static final int MAX_PLAYERS = 15;
 
-    private final ExecutorService workers;
-    private final List<ServerWorker> workerList;
-    private Question question;
+    private int totalPoints = 0;
 
     public static void main(String[] args) {
 
+        int port = Constants.DEFAULT_PORT; // default value of local port
+
+        // Validate first argument being the local port the server should bind to
+        if (args.length > 0) {
+
+            port = Integer.parseInt(args[0]);
+
+        }
+
         Server server = new Server();
-        server.start();
+        server.start(port);
 
     }
 
-    public Server() {
+    private void start(int port) {
 
-        this.workers = Executors.newFixedThreadPool(MAX_PLAYERS);
-        this.workerList = new ArrayList<>();
-
-    }
-
-    private void start() {
-
-        int rightAnswersCounter = 0;
+        List<ServerWorker> workerList = new ArrayList<>();
+        ExecutorService workers = Executors.newFixedThreadPool(Constants.MAX_PLAYERS);
+        QuestionDatabase questionDatabase = new QuestionDatabase();
+        List<String> questions;
         int playerCounter = 0;
+
+        Thread.currentThread().setName("ServerMain");
 
         try {
 
-            ServerSocket serverSocket = new ServerSocket(8080);
+            ServerSocket serverSocket = new ServerSocket(port);
+            Socket clientSocket = null;
 
-            QuestionChooser questionChooser = new SequentialQuestionChooser();
+            /** Game Lobby Stage */
+            logger.log(Level.INFO, LogMessages.LISTENING_CONNECTIONS);
 
-            // Game Lobby Stage
+            // Receive client connection and pass the corresponding socket to the server worker
 
-            // Receive client connection and take socket streams
-            Socket clientSocket = serverSocket.accept();
-            logger.log(Level.INFO, LogMessages.ACCEPTED_CONNECTION + " " + clientSocket);
+            while (playerCounter < Constants.MIN_PLAYERS) {
 
-            ServerWorker newWorker = new ServerWorker(clientSocket);
-            workerList.add(newWorker);
-            playerCounter++;
+                clientSocket = serverSocket.accept();
+                logger.log(Level.INFO, LogMessages.ACCEPTED_CONNECTION + " " + clientSocket);
 
-            // After game start Stage
+                ServerWorker newWorker = new ServerWorker(clientSocket);
+                workerList.add(newWorker);
 
-            // Choose a question
-            question = questionChooser.chooseQuestion();
+                playerCounter++;
+            }
 
-            // Send question to all workers
+            logger.log(Level.INFO, LogMessages.LC_EXTRA_TIME);
+            while (playerCounter < Constants.MAX_PLAYERS) {
+                try {
 
+                    clientSocket = serverSocket.accept();
+                    logger.log(Level.INFO, LogMessages.ACCEPTED_CONNECTION + " " + clientSocket);
+
+                    ServerWorker newWorker = new ServerWorker(clientSocket);
+                    workerList.add(newWorker);
+                    playerCounter++;
+
+                } catch (SocketTimeoutException timeoutException) {
+
+                    logger.log(Level.WARNING, LogMessages.CLIENT_CONNECTION_TIMED_OUT);
+                    break;
+
+                }
+            }
+
+            // After Lobby Stage start Game
+
+            logger.log(Level.INFO, LogMessages.STARTING_GAME);
+
+            // Send all questions to all players - Each worker has a list of questions to send and will do that, when it starts to run
+            logger.log(Level.INFO, LogMessages.SENDING_QUESTIONS);
             for (ServerWorker worker : workerList) {
 
                 workers.submit(worker);
 
             }
 
-            // Validate answer and return to server worker
+            /** while ()
+            wait();
+            int totalPoints = getTotalPoints(); */
 
-            for (ServerWorker worker : workerList) {
-
-                String workerAnswer = worker.getAnswer();
-                if (question.getCorrectAnswer().equals(workerAnswer)) {
-
-                    rightAnswersCounter++;
-                    logger.log(Level.INFO, "Right answer");
-                    worker.sendFeedback(Strings.RIGHT_ANSWER);
-
-                } else {
-
-                    logger.log(Level.INFO, "Wrong answer");
-                    worker.sendFeedback(Strings.WRONG_ANSWER);
-
-                }
-            }
-
-            for (ServerWorker worker : workerList) {
-
-                worker.wait();
-
-            }
-
-            logger.log(Level.INFO, String.valueOf(rightAnswersCounter));
-
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
 
             logger.log(Level.WARNING, e.getMessage());
 
@@ -107,42 +111,87 @@ public class Server {
 
     }
 
-    public Question getQuestion() {
-        return question;
+    private synchronized void addPoints (int points) {
+
+        this.totalPoints += points;
+
+    }
+
+    private synchronized int getTotalPoints() {
+
+        return this.totalPoints;
+
     }
 
     private final class ServerWorker implements Runnable {
 
-        private Socket clientSocket;
+        private final Socket clientSocket;
 
-        private BufferedWriter out;
+        private final BufferedReader in;
+        private final BufferedWriter out;
 
-        private String answer;
+        private List<String> questions;
+        private QuestionDatabase questionDatabase;
+
 
         ServerWorker(Socket clientSocket) {
 
-            this.clientSocket = clientSocket;
+            BufferedReader in = null;
+            BufferedWriter out = null;
 
+            this.clientSocket = clientSocket;
+            this.questionDatabase = new QuestionDatabase();
+            try {
+
+                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+
+            } catch (IOException e) {
+
+                logger.log(Level.WARNING, e.getMessage());
+            }
+
+            this.in = in;
+            this.out = out;
         }
 
         @Override
         public void run() {
 
+            int counter = 0;
+            String[] question_split;
+            int totalPoints;
+
             try {
+                questionDatabase.buildList();
+                questions = questionDatabase.getqAList();
 
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
 
-                while (true) {
+                while (clientSocket.isBound()) {
 
-                    // Send chosen question
-                    out.write(question.getText());
-                    out.newLine();
-                    out.flush();
+                    // Send chosen questions
+
+                    while (counter < Constants.MAX_ROUNDS) {
+
+                        for (String question : questions) {
+                            question_split = question.split("\n");
+                            for (int i = 0; i < question_split.length; i++) {
+
+                                out.write(question_split[i]);
+                                out.newLine();
+
+                            }
+
+                            out.flush();
+                        }
+                        counter++;
+
+                    }
 
                     // Print answer
-                    answer = in.readLine();
-                    System.out.println(answer);
+                    totalPoints = Integer.parseInt(in.readLine());
+                    //Server.this.addPoints(totalPoints);
+                    logger.log(Level.INFO, "Total points " + totalPoints);
 
                 }
 
@@ -152,7 +201,7 @@ public class Server {
 
         }
 
-        private void sendFeedback (String feedback) {
+        private void sendFeedback(String feedback) {
 
             try {
 
@@ -164,12 +213,6 @@ public class Server {
             } catch (IOException e) {
                 logger.log(Level.WARNING, e.getMessage());
             }
-        }
-
-        String getAnswer () {
-
-            return answer;
-
         }
     }
 }

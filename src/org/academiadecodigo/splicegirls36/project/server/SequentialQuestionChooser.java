@@ -8,7 +8,7 @@ import java.util.List;
 
 public class SequentialQuestionChooser implements QuestionChooser{
 
-    private List<Question> questions;
+    private List<String> questions;
     private  QuestionDatabase questionDatabase;
     private int questionIndex = 0;
 
@@ -21,8 +21,8 @@ public class SequentialQuestionChooser implements QuestionChooser{
 
 
     @Override
-    public Question chooseQuestion() {
-       Question question = questions.get(questionIndex);
+    public String chooseQuestion() {
+       String question = questions.get(questionIndex);
        questionIndex++;
        return question;
     }
