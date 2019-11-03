@@ -112,11 +112,11 @@ public class Server {
         ServerWorker(Socket clientSocket) {
 
             this.clientSocket = clientSocket;
-
         }
 
+
         @Override
-        public void run() {;
+        public void run() {
 
             try {
 
@@ -158,15 +158,11 @@ public class Server {
         }
 
         String getAnswer () {
-
             return answer;
-
         }
 
         void setQuestion (Question question) {
-
             this.question = question;
-
         }
     }
 }
