@@ -21,28 +21,26 @@ public class Server {
     public static final Logger logger = Logger.getLogger(Server.class.getName());
     public static final int MAX_PLAYERS = 15;
 
-    private final ExecutorService workers;
-    private final List<ServerWorker> workerList;
-    private Question question;
-
     public static void main(String[] args) {
+
+        int port = 8080; // default value of local port
+
+        // Validate first argument being the local port the server should bind to
+        if (args.length > 0) {
+
+            port = Integer.parseInt(args[0]);
+
+        }
 
         Server server = new Server();
         server.start();
 
     }
 
-    public Server() {
-
-        this.workers = Executors.newFixedThreadPool(MAX_PLAYERS);
-        this.workerList = new ArrayList<>();
-
-    }
-
     private void start() {
 
-        int rightAnswersCounter = 0;
-        int playerCounter = 0;
+        List<ServerWorker> workerList = new ArrayList<>();
+        ExecutorService workers = Executors.newFixedThreadPool(MAX_PLAYERS);
 
         try {
 
@@ -54,7 +52,6 @@ public class Server {
             Socket clientSocket = serverSocket.accept();
             logger.log(Level.INFO, LogMessages.ACCEPTED_CONNECTION + " " + clientSocket);
 
-            playerCounter++;
             ServerWorker newWorker = new ServerWorker(clientSocket);
             workerList.add(newWorker);
             Thread thread = new Thread(newWorker);
