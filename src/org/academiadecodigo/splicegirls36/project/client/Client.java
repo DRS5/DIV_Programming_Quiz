@@ -1,6 +1,7 @@
 package org.academiadecodigo.splicegirls36.project.client;
 
 import org.academiadecodigo.splicegirls36.project.terminal.TerminalPrompt;
+import org.academiadecodigo.splicegirls36.project.utils.Constants;
 import org.academiadecodigo.splicegirls36.project.utils.LogMessages;
 
 import java.io.*;
@@ -46,21 +47,33 @@ public class Client {
 
     public void start () {
 
-        String line;
         String answer;
         StringBuilder question = new StringBuilder();
         TerminalPrompt terminal = new TerminalPrompt();
+        String quizQuestion;
+        String answerA;
+        String answerB;
+        String answerC;
+        String answerD;
+        String explanation;
+        String correctAnswer;
+        int counter = 0;
 
         try {
 
             while (serverConnection.isBound()) {
 
-                // Get chosen question from server
-                line = inputFromServer.readLine();
-                while (!line.isEmpty()) {
+                // Get chosen questions from server
+                while (counter < Constants.MAX_ROUNDS) {
+                    quizQuestion = inputFromServer.readLine();
+                    answerA = inputFromServer.readLine();
+                    answerB = inputFromServer.readLine();
+                    answerC = inputFromServer.readLine();
+                    answerD = inputFromServer.readLine();
                     question.append(line);
                     question.append("\n");
                     line = inputFromServer.readLine();
+                    counter++;
                 }
 
                 // Ask player for chosen answer
