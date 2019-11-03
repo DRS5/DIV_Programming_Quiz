@@ -1,8 +1,6 @@
 package org.academiadecodigo.splicegirls36.project.server;
 
-import org.academiadecodigo.splicegirls36.project.domain.Question;
 import org.academiadecodigo.splicegirls36.project.store.QuestionDatabase;
-import org.academiadecodigo.splicegirls36.project.terminal.Strings;
 import org.academiadecodigo.splicegirls36.project.utils.Constants;
 import org.academiadecodigo.splicegirls36.project.utils.LogMessages;
 import java.io.*;
@@ -20,6 +18,8 @@ import java.util.logging.Logger;
 public class Server {
 
     public static final Logger logger = Logger.getLogger(Server.class.getName());
+
+    private int totalPoints = 0;
 
     public static void main(String[] args) {
 
@@ -44,6 +44,8 @@ public class Server {
         QuestionDatabase questionDatabase = new QuestionDatabase();
         List<String> questions;
         int playerCounter = 0;
+
+        Thread.currentThread().setName("ServerMain");
 
         try {
 
@@ -97,11 +99,27 @@ public class Server {
 
             }
 
+            /** while ()
+            wait();
+            int totalPoints = getTotalPoints(); */
+
         } catch (IOException e) {
 
             logger.log(Level.WARNING, e.getMessage());
 
         }
+
+    }
+
+    private synchronized void addPoints (int points) {
+
+        this.totalPoints += points;
+
+    }
+
+    private synchronized int getTotalPoints() {
+
+        return this.totalPoints;
 
     }
 
@@ -170,9 +188,9 @@ public class Server {
 
                     }
 
-
                     // Print answer
                     totalPoints = Integer.parseInt(in.readLine());
+                    //Server.this.addPoints(totalPoints);
                     logger.log(Level.INFO, "Total points " + totalPoints);
 
                 }
