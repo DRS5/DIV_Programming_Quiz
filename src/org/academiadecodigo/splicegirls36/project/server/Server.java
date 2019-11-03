@@ -41,7 +41,8 @@ public class Server {
 
         List<ServerWorker> workerList = new ArrayList<>();
         ExecutorService workers = Executors.newFixedThreadPool(Constants.MAX_PLAYERS);
-        List<String> questions = new ArrayList<>();
+        QuestionDatabase questionDatabase = new QuestionDatabase();
+        List<String> questions;
         int playerCounter = 0;
 
         try {
@@ -84,10 +85,17 @@ public class Server {
                 }
             }
 
-            // After game start Stage
+            // After Lobby Stage start Game
 
-            // Send all questions to all players
-            questions.add(Strings.QUESTION_1);
+            logger.log(Level.INFO, LogMessages.STARTING_GAME);
+
+            // Send all questions to all players - Each worker has a list of questions to send and will do that, when it starts to run
+            logger.log(Level.INFO, LogMessages.SENDING_QUESTIONS);
+            for (ServerWorker worker : workerList) {
+
+                workers.submit(worker);
+
+            }
 
             // Validate answer and return to server worker
 
@@ -115,47 +123,59 @@ public class Server {
 
     }
 
-    public Question getQuestion() {
-        return question;
-    }
-
     private final class ServerWorker implements Runnable {
 
-        private Socket clientSocket;
+        private final Socket clientSocket;
 
-        private String answer;
+        private final BufferedReader in;
+        private final BufferedWriter out;
 
-        private BufferedWriter out;
-
-        private List<Question> questions;
+        private List<String> questions;
         private QuestionDatabase questionDatabase;
         private int questionIndex = 0;
 
-        QuestionChooser questionChooser = new SequentialQuestionChooser();
 
         ServerWorker(Socket clientSocket) {
 
+            BufferedReader in = null;
+            BufferedWriter out = null;
+
             this.clientSocket = clientSocket;
             this.questionDatabase = new QuestionDatabase();
+            try {
 
+                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+
+            } catch (IOException e) {
+
+                logger.log(Level.WARNING, e.getMessage());
+            }
+
+            this.in = in;
+            this.out = out;
         }
 
         @Override
         public void run() {
 
+            int counter = 0;
+
             try {
                 questionDatabase.buildList();
                 questions = questionDatabase.getqAList();
 
-                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
 
-                while (true) {
-                    // Choose a question
-                    question = chooseQuestion();
+                while (clientSocket.isBound()) {
+
+                    // Send chosen questions
+
+                    while (counter < Constants.MAX_ROUNDS) {
 
 
-                    // Send chosen question
+                        counter++;
+
+                    }
                     out.write(question.getText());
                     out.newLine();
                     out.flush();
@@ -197,17 +217,6 @@ public class Server {
             } catch (IOException e) {
                 logger.log(Level.WARNING, e.getMessage());
             }
-        }
-
-        String getAnswer() {
-
-            return answer;
-
-        }
-
-        public Question chooseQuestion() {
-            Question question = questions.get(questionIndex);
-            return question;
         }
     }
 }
