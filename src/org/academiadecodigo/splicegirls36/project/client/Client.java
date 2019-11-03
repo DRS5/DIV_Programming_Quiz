@@ -4,6 +4,8 @@ import org.academiadecodigo.splicegirls36.project.terminal.TerminalPrompt;
 import org.academiadecodigo.splicegirls36.project.utils.Constants;
 import org.academiadecodigo.splicegirls36.project.utils.LogMessages;
 
+import javax.sound.midi.Soundbank;
+import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -39,6 +41,7 @@ public class Client {
         } catch (IOException exception) {
 
             logger.log(Level.SEVERE, LogMessages.FAILED_CONNECTION);
+            System.exit(1);
 
         }
 
@@ -61,17 +64,15 @@ public class Client {
         String explanation;
         String correctAnswer;
         int counter = 0;
-        List<String> questionStrings = new LinkedList<>();
+        List<String> questionStrings = new ArrayList<>();
         List<String> explanations = new ArrayList<>();
         List<String> correctAnswers = new ArrayList<>();
         int points = 0;
 
         try {
 
-            while (serverConnection.isBound()) {
-
                 // Get chosen questions from server
-                while (counter < 1) {
+                while (counter < Constants.MAX_ROUNDS) {
                     quizQuestion = inputFromServer.readLine();
                     answerA = inputFromServer.readLine();
                     answerB = inputFromServer.readLine();
@@ -80,24 +81,29 @@ public class Client {
                     explanation = inputFromServer.readLine();
                     correctAnswer = inputFromServer.readLine();
                     question.append(quizQuestion);
+                    question.append("\n");
                     question.append(answerA);
+                    question.append("\n");
                     question.append(answerB);
+                    question.append("\n");
                     question.append(answerC);
+                    question.append("\n");
                     question.append(answerD);
                     question.append("\n");
                     questionStrings.add(question.toString());
                     explanations.add(explanation);
                     correctAnswers.add(correctAnswer);
-                    question.delete(0, question.length());
+                    question.delete(0, question.length() - 1);
                     counter++;
+
                 }
 
                 for (int i = 0; i < Constants.MAX_ROUNDS; i++) {
 
                     // Ask player for chosen answer
-
+                    System.out.println("Round " + i);
                     answer = terminal.askQuestion(questionStrings.get(i));
-                    System.out.println(answer);
+
                     if (answer.equals(correctAnswers.get(i))){
                         System.out.println("Right Answer");
                         points++;
@@ -105,12 +111,14 @@ public class Client {
                         System.out.println("Wrong Answer");
                     }
                     System.out.println(explanations.get(i));
+                    System.out.println("\n\n");
                 }
                 outputToServer.write(points);
                 outputToServer.newLine();
                 outputToServer.flush();
 
-                System.out.println("You finished with " + points + "!");
+                System.out.println("You finished with " + points + " POOOOOOOOOINTS!!");
+                close();
 
 
 
@@ -118,14 +126,10 @@ public class Client {
                 /*line = inputFromServer.readLine();
                 System.out.println(line);*/
 
-            }
-
         } catch (IOException exception) {
             logger.log(Level.SEVERE, exception.getMessage());
 
         }
-
-        close();
 
     }
 

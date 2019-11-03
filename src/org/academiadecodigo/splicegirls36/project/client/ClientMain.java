@@ -12,11 +12,9 @@ public class ClientMain {
 
     public static void main(String[] args) {
 
-
-
         //InetAddress address = InetAddress.getByName();
-        int port = 8080;
-        Client client = null;
+        int port;
+        Client client;
 
         try {
 

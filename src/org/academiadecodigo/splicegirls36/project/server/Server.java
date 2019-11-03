@@ -68,6 +68,7 @@ public class Server {
                 playerCounter++;
             }
 
+            serverSocket.setSoTimeout(Constants.MAX_TIME);
             logger.log(Level.INFO, LogMessages.LC_EXTRA_TIME);
             while (playerCounter < Constants.MAX_PLAYERS) {
                 try {
@@ -175,14 +176,14 @@ public class Server {
 
                         for (String question : questions) {
                             question_split = question.split("\n");
+                            System.out.println(question_split);
                             for (int i = 0; i < question_split.length; i++) {
 
                                 out.write(question_split[i]);
                                 out.newLine();
+                                out.flush();
 
                             }
-
-                            out.flush();
                         }
                         counter++;
 
