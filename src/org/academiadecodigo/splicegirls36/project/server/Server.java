@@ -19,7 +19,9 @@ public class Server {
 
     public static final Logger logger = Logger.getLogger(Server.class.getName());
 
-    private int totalPoints = 0;
+    private volatile int totalPoints = 0;
+    private volatile int workerCount = 0;
+    private List<ServerWorker> workerList = new ArrayList<>();
 
     public static void main(String[] args) {
 
@@ -39,7 +41,6 @@ public class Server {
 
     private void start(int port) {
 
-        List<ServerWorker> workerList = new ArrayList<>();
         ExecutorService workers = Executors.newFixedThreadPool(Constants.MAX_PLAYERS);
         QuestionDatabase questionDatabase = new QuestionDatabase();
         List<String> questions;
@@ -99,9 +100,9 @@ public class Server {
 
             }
 
-            // while ()
-            wait();
-            int totalPoints = getTotalPoints(); */
+            sendTotalPointsAll(getTotalPoints());
+
+            serverSocket.close();
 
         } catch (IOException e) {
 
@@ -111,13 +112,34 @@ public class Server {
 
     }
 
-    private synchronized void addPoints (int points) {
+    private void sendTotalPointsAll (int totalPoints) {
 
+        for (ServerWorker worker : workerList) {
+
+            worker.sendTotalPoints(totalPoints);
+
+        }
+
+    }
+
+    private synchronized void addPoints(int points) {
+
+        if (workerCount == this.workerList.size()) {
+            notifyAll();
+            return;
+        }
         this.totalPoints += points;
+        this.workerCount++;
 
     }
 
     private synchronized int getTotalPoints() {
+
+        try {
+            wait();
+        } catch (InterruptedException e) {
+            logger.log(Level.WARNING, e.getMessage());
+        }
 
         return this.totalPoints;
 
@@ -174,15 +196,16 @@ public class Server {
                     while (counter < Constants.MAX_ROUNDS) {
 
                         for (String question : questions) {
+
                             question_split = question.split("\n");
                             for (int i = 0; i < question_split.length; i++) {
 
                                 out.write(question_split[i]);
                                 out.newLine();
-
+                                out.flush();
                             }
 
-                            out.flush();
+
                         }
                         counter++;
 
@@ -201,18 +224,16 @@ public class Server {
 
         }
 
-        private void sendFeedback(String feedback) {
+        private void sendTotalPoints(int totalPoints) {
 
             try {
-
-                System.out.println(feedback);
-                out.write(feedback);
+                out.write(totalPoints);
                 out.newLine();
                 out.flush();
-
             } catch (IOException e) {
                 logger.log(Level.WARNING, e.getMessage());
             }
+
         }
     }
 }
