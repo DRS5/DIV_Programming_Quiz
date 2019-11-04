@@ -78,7 +78,7 @@ public class Strings {
             "C - 105; \n " +
             "D - Compile-time error; \n" +
             "The first number gets appended to the string! \n" +
-            "A" +
+            "B" +
             "";
 
 

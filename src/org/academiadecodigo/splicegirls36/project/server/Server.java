@@ -4,7 +4,6 @@ import org.academiadecodigo.splicegirls36.project.store.QuestionDatabase;
 import org.academiadecodigo.splicegirls36.project.utils.Constants;
 import org.academiadecodigo.splicegirls36.project.utils.LogMessages;
 
-import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;

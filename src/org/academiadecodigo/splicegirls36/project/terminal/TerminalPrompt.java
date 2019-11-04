@@ -22,7 +22,7 @@ public class TerminalPrompt {
         askName.setMessage("What is your name? \n");
 
         String answer = prompt.getUserInput(askName);
-        System.out.println("Name is " + answer);
+        System.out.println("Welcome " + answer);
         return answer;
     }
 
