@@ -19,7 +19,6 @@ public class Client {
 
     public static final Logger logger = Logger.getLogger(Client.class.getName());
     public static final String CHARSET = "UTF8";
-
     private final Socket serverConnection;
     private final BufferedReader inputFromServer;
     private final BufferedWriter outputToServer;
@@ -29,7 +28,6 @@ public class Client {
         Socket connection = null;
         BufferedReader in = null;
         BufferedWriter out = null;
-
         try {
 
             connection = new Socket(address, port);
@@ -54,6 +52,8 @@ public class Client {
     public void start () {
 
         String answer;
+        String name;
+        String winnerName;
         StringBuilder question = new StringBuilder();
         TerminalPrompt terminal = new TerminalPrompt();
         String quizQuestion;
@@ -71,66 +71,73 @@ public class Client {
 
         try {
 
-                // Get chosen questions from server
-                while (counter < Constants.MAX_ROUNDS) {
-                    quizQuestion = inputFromServer.readLine();
-                    answerA = inputFromServer.readLine();
-                    answerB = inputFromServer.readLine();
-                    answerC = inputFromServer.readLine();
-                    answerD = inputFromServer.readLine();
-                    explanation = inputFromServer.readLine();
-                    correctAnswer = inputFromServer.readLine();
-                    question.append(quizQuestion);
-                    question.append("\n");
-                    question.append(answerA);
-                    question.append("\n");
-                    question.append(answerB);
-                    question.append("\n");
-                    question.append(answerC);
-                    question.append("\n");
-                    question.append(answerD);
-                    question.append("\n");
-                    questionStrings.add(question.toString());
-                    explanations.add(explanation);
-                    correctAnswers.add(correctAnswer);
-                    question.delete(0, question.length() - 1);
-                    counter++;
 
+            name = terminal.askName();
+            outputToServer.write(name);
+            outputToServer.newLine();
+            outputToServer.flush();
+
+            // Get chosen questions from server
+            while (counter < Constants.MAX_ROUNDS) {
+                quizQuestion = inputFromServer.readLine();
+                answerA = inputFromServer.readLine();
+                answerB = inputFromServer.readLine();
+                answerC = inputFromServer.readLine();
+                answerD = inputFromServer.readLine();
+                explanation = inputFromServer.readLine();
+                correctAnswer = inputFromServer.readLine();
+                question.append(quizQuestion);
+                question.append("\n");
+                question.append(answerA);
+                question.append("\n");
+                question.append(answerB);
+                question.append("\n");
+                question.append(answerC);
+                question.append("\n");
+                question.append(answerD);
+                question.append("\n");
+                questionStrings.add(question.toString());
+                explanations.add(explanation);
+                correctAnswers.add(correctAnswer);
+                question.delete(0, question.length() - 1);
+                counter++;
+
+            }
+
+            for (int i = 0; i < Constants.MAX_ROUNDS; i++) {
+
+                // Ask player for chosen answer
+                System.out.println("Round " + i);
+                answer = terminal.askQuestion(questionStrings.get(i));
+
+                if (answer.equals(correctAnswers.get(i))){
+                    System.out.println("Right Answer");
+                    points++;
+                } else {
+                    System.out.println("Wrong Answer");
                 }
+                System.out.println(explanations.get(i));
+                System.out.println("\n\n");
+            }
+            outputToServer.write(String.valueOf(points));
+            outputToServer.newLine();
+            outputToServer.flush();
 
-                for (int i = 0; i < Constants.MAX_ROUNDS; i++) {
+            System.out.println("You finished with " + points + " POOOOOOOOOINTS!!!");
 
-                    // Ask player for chosen answer
-                    System.out.println("Round " + i);
-                    answer = terminal.askQuestion(questionStrings.get(i));
-
-                    if (answer.equals(correctAnswers.get(i))){
-                        System.out.println("Right Answer");
-                        points++;
-                    } else {
-                        System.out.println("Wrong Answer");
-                    }
-                    System.out.println(explanations.get(i));
-                    System.out.println("\n\n");
-                }
-                outputToServer.write(points);
-                outputToServer.newLine();
-                outputToServer.flush();
-
-                System.out.println("You finished with " + points + " POOOOOOOOOINTS!!!");
-                close();
-
-
-
-                // Get feedback from server
-                /*line = inputFromServer.readLine();
-                System.out.println(line);*/
+            // Get feedback from server
+            winnerName = inputFromServer.readLine();
+            System.out.println("Winner is " + winnerName);
 
         } catch (IOException exception) {
             logger.log(Level.SEVERE, exception.getMessage());
 
         }
 
+        finally {
+            close();
+            System.exit(0);
+        }
     }
 
     private void close () {

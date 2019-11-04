@@ -5,7 +5,6 @@ import org.academiadecodigo.splicegirls36.project.utils.LogMessages;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.util.logging.Level;
 
 public class ClientMain {

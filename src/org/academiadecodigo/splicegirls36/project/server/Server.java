@@ -3,12 +3,13 @@ package org.academiadecodigo.splicegirls36.project.server;
 import org.academiadecodigo.splicegirls36.project.store.QuestionDatabase;
 import org.academiadecodigo.splicegirls36.project.utils.Constants;
 import org.academiadecodigo.splicegirls36.project.utils.LogMessages;
+
+import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -19,9 +20,9 @@ public class Server {
 
     public static final Logger logger = Logger.getLogger(Server.class.getName());
 
-    private volatile int totalPoints = 0;
     private volatile int workerCount = 0;
     private List<ServerWorker> workerList = new ArrayList<>();
+    private Map<String, Integer> playerPoints = new Hashtable<>();
 
     public static void main(String[] args) {
 
@@ -101,7 +102,12 @@ public class Server {
 
             }
 
-            sendTotalPointsAll(getTotalPoints());
+            System.out.println("Getting winner!");
+            String winnerName = getWinner();
+
+            System.out.println("Winner: " + winnerName);
+
+            sendTotalPointsAll(winnerName);
 
             serverSocket.close();
 
@@ -110,50 +116,69 @@ public class Server {
             logger.log(Level.WARNING, e.getMessage());
 
         }
+        System.exit(0);
+    }
+
+    private void sendTotalPointsAll (String winnerName) {
+
+        //for (ServerWorker worker : workerList) {
+
+            workerList.get(0).sendWinnerName(winnerName);
+
+        //}
 
     }
 
-    private void sendTotalPointsAll (int totalPoints) {
+    private synchronized void addPoints(String name, int points) {
 
-        for (ServerWorker worker : workerList) {
-
-            worker.sendTotalPoints(totalPoints);
-
-        }
-
-    }
-
-    private synchronized void addPoints(int points) {
-
-        if (workerCount == this.workerList.size()) {
-            notifyAll();
-            return;
-        }
-        this.totalPoints += points;
+        this.playerPoints.put(name, points);
         this.workerCount++;
+        System.out.println("Number of players" + workerCount + " worker list size " + workerList.size());
+        if (workerCount == (this.workerList.size())) {
+            System.out.println("notifyAll next");
+            notifyAll();
+        }
 
     }
 
-    private synchronized int getTotalPoints() {
+    private synchronized String getWinner() {
 
         try {
+            System.out.println("About to wait");
             wait();
+            System.out.println("Woke up");
         } catch (InterruptedException e) {
             logger.log(Level.WARNING, e.getMessage());
         }
+        System.out.println("Getting winner, getWinner method");
+        int maxPoints = 0;
+        String winnerName = null;
+        Set<String> names = playerPoints.keySet();
 
-        return this.totalPoints;
+        System.out.println("Names size " + names.size());
+        System.out.println("Players points " + playerPoints.size());
+
+        for (String name : names) {
+            System.out.println("Name " + name);
+            if (playerPoints.get(name) > maxPoints) {
+
+                maxPoints = playerPoints.get(name);
+                winnerName = name;
+
+                System.out.println("Potential winner " + name + " Points " +  maxPoints);
+            }
+        }
+
+        return winnerName;
 
     }
 
     private final class ServerWorker implements Runnable {
 
         private final Socket clientSocket;
-
         private final BufferedReader in;
         private final BufferedWriter out;
 
-        private List<String> questions;
         private QuestionDatabase questionDatabase;
 
 
@@ -163,6 +188,7 @@ public class Server {
             BufferedWriter out = null;
 
             this.clientSocket = clientSocket;
+
             this.questionDatabase = new QuestionDatabase();
             try {
 
@@ -187,37 +213,36 @@ public class Server {
 
             try {
                 questionDatabase.buildList();
-                questions = questionDatabase.getqAList();
+                List<String> questions = questionDatabase.getqAList();
 
-
-                while (clientSocket.isBound()) {
+                String name = in.readLine();
 
                     // Send chosen questions
 
-                    while (counter < Constants.MAX_ROUNDS) {
+                    //while (counter < Constants.MAX_ROUNDS) {
 
                         for (String question : questions) {
 
                             question_split = question.split("\n");
-                            System.out.println(question_split);
-                            for (int i = 0; i < question_split.length; i++) {
+                            for (String s : question_split) {
 
-                                out.write(question_split[i]);
+                                out.write(s);
                                 out.newLine();
                                 out.flush();
-
                             }
+
                         }
                         counter++;
 
-                    }
+                        System.out.println("Counter" + counter);
+
+                    //}
 
                     // Print answer
                     totalPoints = Integer.parseInt(in.readLine());
-                    Server.this.addPoints(totalPoints);
-                    logger.log(Level.INFO, "Total points " + totalPoints);
-
-                }
+                    System.out.println("Now adding points.");
+                    Server.this.addPoints(name, totalPoints);
+                    logger.log(Level.INFO, "Name " + name + ", total points " + totalPoints);
 
             } catch (IOException exception) {
                 logger.log(Level.SEVERE, exception.getMessage());
@@ -225,10 +250,12 @@ public class Server {
 
         }
 
-        private void sendTotalPoints(int totalPoints) {
+        private void sendWinnerName(String winnerName) {
 
             try {
-                out.write(totalPoints);
+
+                System.out.println(winnerName);
+                out.write(winnerName);
                 out.newLine();
                 out.flush();
             } catch (IOException e) {

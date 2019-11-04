@@ -1,6 +1,7 @@
 package org.academiadecodigo.splicegirls36.project.terminal;
 
 import org.academiadecodigo.bootcamp.Prompt;
+import org.academiadecodigo.bootcamp.scanners.string.StringInputScanner;
 import org.academiadecodigo.bootcamp.scanners.string.StringSetInputScanner;
 
 import java.util.HashSet;
@@ -14,6 +15,16 @@ public class TerminalPrompt {
     private Set<String> possibleAnswers = new HashSet<>();
     private Timer timer = new Timer();
 
+
+    public String askName() {
+
+        StringInputScanner askName = new StringInputScanner();
+        askName.setMessage("What is your name? \n");
+
+        String answer = prompt.getUserInput(askName);
+        System.out.println("Name is " + answer);
+        return answer;
+    }
 
     public String askQuestion(String question){
         setAnswerOptions();

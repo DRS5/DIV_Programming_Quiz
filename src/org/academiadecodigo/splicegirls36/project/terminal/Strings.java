@@ -157,7 +157,7 @@ public class Strings {
             "B - 1993; \n " +
             "C - 1994; \n " +
             "D - 1995; \n" +
-            "No excuse not to know this..." +
+            "No excuse not to know this... \n" +
             "C" +
             "";
 
