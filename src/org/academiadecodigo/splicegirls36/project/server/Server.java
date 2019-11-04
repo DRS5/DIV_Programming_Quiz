@@ -120,11 +120,11 @@ public class Server {
 
     private void sendTotalPointsAll (String winnerName) {
 
-        //for (ServerWorker worker : workerList) {
+        for (ServerWorker worker : workerList) {
 
-            workerList.get(0).sendWinnerName(winnerName);
+            worker.sendWinnerName(winnerName);
 
-        //}
+        }
 
     }
 
