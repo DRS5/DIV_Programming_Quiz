@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 
-<project name="briscolaofthreept" default="jarfile">
+<project name="div_server" default="jarfile">
 
     <!-- Initialize build properties  -->
     <target name="init" description="Initializes properties">
-        <property name="project.name" value="Diogo_Ines_Vitor" />
+        <property name="project.name" value="div_server" />
         <property name="src.dir" value="src" />
-        <property name="main.class" value="org.academiadecodigo.splicegirls36.project.client.ClientMain" />
+        <property name="main.class" value="org.academiadecodigo.splicegirls36.project.server.Server" />
         <property name="build.dir" value="build" />
         <property name="classes.dir" value="${build.dir}/classes" />
         <property name="lib.dir" value="lib" />
